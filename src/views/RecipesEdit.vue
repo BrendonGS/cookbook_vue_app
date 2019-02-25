@@ -2,7 +2,7 @@
   <div class="recipes-edit">
     <h1>Edit Recipe</h1>
     <ul>
-      <li v-for="error in errors">{{ error }}</li>
+      <li v-for="error in errors">{{ error }}</li> 
     </ul>
     <form v-on:submit.prevent="submit()">
         <div>
