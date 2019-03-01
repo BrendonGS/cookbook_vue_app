@@ -1,4 +1,3 @@
-
 <template>
   <div class="recipes-index">
     <h1>All Recipes</h1>
@@ -6,41 +5,38 @@
       Filter Title: <input v-model="titleFilter" list="titles">
 
       <datalist id="titles">
-        <option v-for="recipe in recipes">{{recipe.title}}</option>
-
+        <option v-for="recipe in recipes">{{ recipe.title }}</option>
       </datalist>
-
     </div>
 
-    <div>
-      <button v-on:click="setSortAttribute('title')">Sort by Title</button>
-      <button v-on:click="setSortAttribute('prep_time')">Sort by Prep Time</button>
-    </div>
-
- <table style="width:100%">
-   <tr>
-     <th>ID</th>
-     <th>Title</th> 
-     <th>Chef</th>
-     <th>Prep Time</th>
-   </tr>
-   <tr v-for="recipe in orderBy(filterBy(recipes, titleFilter, 'title'), sortAttribute)">
-     <td>
-       {{ recipe.id }}
-     </td>
-     <td>
-       <router-link v-bind:to="'/recipes/' + recipe.id">
-         {{ recipe.title }}
-       </router-link>
-     </td>
-     <td>
-       {{ recipe.chef }}
-     </td>
-     <td>
-       {{ recipe.formatted.prep_time }}
-     </td>
-   </tr>
- </table>
+    <table class="table table-striped table-dark">
+      <thead class="thead-light">
+        <tr>
+          <th scope="col" v-on:click="setSortAttribute('id')">ID {{ orderIndicator('id') }}</th>
+          <th scope="col" v-on:click="setSortAttribute('title')">Title  {{ orderIndicator('title') }}</th> 
+          <th scope="col" v-on:click="setSortAttribute('chef')">Chef {{ orderIndicator('chef') }}</th>
+          <th scope="col" v-on:click="setSortAttribute('prep_time')">Prep Time {{ orderIndicator('prep_time') }}</th>
+        </tr>
+      </thead>
+      <tbody is="transition-group" name="slide-left">
+        <tr v-for="recipe in orderBy(filterBy(recipes, titleFilter, 'title'), sortAttribute, sortOrder)" v-bind:key="recipe.id">
+          <th scope="row">
+            {{ recipe.id }}
+          </th>
+          <td>
+            <router-link v-bind:to="'/recipes/' + recipe.id">
+              {{ recipe.title }}
+            </router-link>
+          </td>
+          <td>
+            {{ recipe.chef }}
+          </td>
+          <td>
+            {{ recipe.formatted.prep_time }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
 
   </div>
 </template>
@@ -57,7 +53,8 @@ export default {
       recipes: [],
       currentRecipe: {},
       titleFilter: '',
-      sortAttribute: 'title'
+      sortAttribute: 'title',
+      sortOrder: 1
     };
   },
   created: function() {
@@ -68,7 +65,23 @@ export default {
   },
   methods: {
     setSortAttribute: function(inputAttribute) {
-      this.sortAttribute = inputAttribute;
+      if (this.sortAttribute === inputAttribute) {
+        this.sortOrder *= -1;
+      } else {
+        this.sortAttribute = inputAttribute;
+        this.sortOrder = 1;
+      }
+    },
+    orderIndicator: function(inputAttribute) {
+      if (this.sortAttribute === inputAttribute) {
+        if (this.sortOrder === 1) {
+          return "▼";
+        } else {
+          return "▲";
+        }
+      } else {
+        return " ";
+      }
     }
   },
   mixins: [Vue2Filters.mixin]
